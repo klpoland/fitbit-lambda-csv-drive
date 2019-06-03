@@ -8,4 +8,4 @@ There are three steps to this process:
 3. Sorting
 
 ### The First Step: Retrieving
-To retrieve each client's Fitbit activities data, I must make a call to the Fitbit API with their access token
+To retrieve each client's Fitbit activities data, I must make a call to the Fitbit API with their access token. The response that comes from this call is a dictionary where one of the keys ("activities") is an array of dictionaries
