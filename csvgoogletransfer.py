@@ -40,21 +40,17 @@ dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 revoke = False
 key_tabledb = dynamodb.Table('Keys')
 
-baseDate = "2019-04-25" #Set to the beginning of the semester, used for urls and refreshing data.
+baseDate = "YYYY-MM-DD" #Set to the beginning of the semester, used for urls and refreshing data.
 
 #Use this URL to refresh the access token
 TokenURL = "https://api.fitbit.com/oauth2/token"
 
 #From the developer site, add b for base64 encode
-OAuthTwoClientID = b"2289JF"
-ClientOrConsumerSecret = b"f34c87a953616b88a697a7a0bb31c94e"
+OAuthTwoClientID = b"*******"
+ClientOrConsumerSecret = b"*********************"
 concatCode = OAuthTwoClientID + b":" + ClientOrConsumerSecret
 
-#OAuthTwoClientID = "2284SK"
-#ClientOrConsumerSecret = "9c38cd48602c52cbbab87627db181f79"
-
 #Some constants defining API error handling responses
-TokenRefreshedOK = "Token refreshed OK"
 ErrorInAPI = "Error when making API call that I couldn't handle"
 
 userTable = key_tabledb.scan()
@@ -65,7 +61,7 @@ userTable = key_tabledb.scan()
 #-------------------------------------- GOOGLE DRIVE API PARAMETERS ------------------------------------
 # authorization parameters for google drive api
 SCOPES = ['https://www.googleapis.com/auth/drive']
-SERVICE_ACCOUNT_FILE = 'service_keys.json'
+SERVICE_ACCOUNT_FILE = 'service_keys.json' #Not included
 #------------------------------------- END GOOGLE DRIVE API PARAMETERS ---------------------------------
 
 #--------------------TOKEN: ACCESS / REFRESH FUNCTIONS--------------------------
