@@ -324,7 +324,6 @@ def lambda_handler(event, context):
                 for entry in APIProfileResponse:
                     age = APIProfileResponse[entry]["age"]
                     weight = APIProfileResponse[entry]["weight"]
-                    #name = APIProfileResponse[entry]["fullName"]
                     fullName = APIProfileResponse[entry]["fullName"]
                     name = reverseName(fullName)
             else:
@@ -349,7 +348,6 @@ def lambda_handler(event, context):
                 print('There was and error in the API. Skipping to next user.')
                 pass
     #--------------------------------------Finish Activities API call--------------------------------------
-    #print(result)
 
     #--------------------------------------SET UP GOOGLE DRIVE ENVIRONMENT---------------------------------
     drive = get_drive_handle()
@@ -373,7 +371,7 @@ def lambda_handler(event, context):
             #insert new permission to get access to folder saved in service account
             folder.InsertPermission({
                 'type':  'user'
-                ,'value': 'olfapps@online.uga.edu'
+                ,'value': <'DEV ACCT EMAIL'>
                 ,'role':  'writer'
                 })  
             break
