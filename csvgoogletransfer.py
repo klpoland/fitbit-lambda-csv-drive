@@ -197,7 +197,7 @@ def get_drive_handle():
 
 #-----------------------------FUNCTIONS FOR HANDLING SPECIFIC API DATA-----------------------------#
 
-def add_activities_data_complete(d, response, d2lid):
+def add_activities_data_complete(d, response, d2lid): #d is the empty dictionary, response is the API response for a single activity
     
     didItCount = True
         
@@ -218,19 +218,19 @@ def add_activities_data_complete(d, response, d2lid):
         originalStartTime = response['originalStartTime']
         d['Start Time'] = originalStartTime
                 
-        if response.get('pace') != None:
+        if response.get('pace') != None: #if there is a value for the 'pace' key
             pace = response['pace']
             d['Pace'] = '%0.2f' % pace # give pace to two places past decimal
         else:
             d['Pace'] = 'N/A'
 
-        if response.get('distance') != None:
+        if response.get('distance') != None: #if there is a value for the 'distance' key
             distance = response['distance']
             d['Distance'] = '%0.2f' % distance # give distance to two places past decimal
         else:
             d['Distance'] = 'N/A'
                     
-        if response.get('steps') != None:
+        if response.get('steps') != None: #and so on...
             d['Steps'] = response['steps']
         else:
             d['Steps'] = 'N/A'
@@ -242,7 +242,7 @@ def add_activities_data_complete(d, response, d2lid):
 
         d['Duration (ms)'] = response['duration']
 
-        if response.get('heartRateZones') != None:
+        if response.get('heartRateZones') != None: 
             zones = response['heartRateZones']
             for z in zones:
                 name = z['name']
@@ -374,18 +374,19 @@ def lambda_handler(event, context):
                 ,'value': <'DEV ACCT EMAIL'>
                 ,'role':  'writer'
                 })  
-            break
-        else:
+        #if the script ahs come to the last file in the list and the title in the list does not match the title I am looking for
+        #a new folder is created with that name
+        elif folder == file_list[-1] and folder['title'] != folder_name:
             new_folder = drive.CreateFile(folder_metadata)
             new_folder.Upload()
             folderid = new_folder['id']
             new_folder.InsertPermission({
                 'type':  'user'
-                ,'value': 'olfapps@online.uga.edu'
+                ,'value': <'DEV ACCT EMAIL'>
                 ,'role':  'writer'
-                })  
-            #print("Done.")
-            break
+                })
+         else:
+            print(folder['title'], " does not match ", folder_name)
 
     #call list of files in folder
     file_folder_list = drive.ListFile({'q': "'%s' in parents and trashed=false" % folderid}).GetList()
