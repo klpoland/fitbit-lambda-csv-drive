@@ -438,10 +438,7 @@ def lambda_handler(event, context):
             
         for dat_file in file_folder_list:
             if dat_file['title'] == filename + '.csv':
-                timestamp = dat_file['createdDate']
-                dat_file['title'] = filename + '-' + timestamp + '.csv' #add timestamp to existing file
-                dat_file.Upload()
-                #print('title: %s' % dat_file['title'])
+                dat_file.Delete()
 
         #upload to drive
         csvfile = drive.CreateFile(metadata)
