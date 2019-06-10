@@ -38,16 +38,16 @@ class DecimalEncoder(json.JSONEncoder):
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 
 revoke = False
-key_tabledb = dynamodb.Table('Keys')
+key_tabledb = dynamodb.Table(<'Key-Table-Name'>)
 
-baseDate = "YYYY-MM-DD" #Set to the beginning of the semester, used for urls and refreshing data.
+baseDate = 'YYYY-MM-DD' #Set to the beginning of the semester, used for urls and refreshing data.
 
 #Use this URL to refresh the access token
-TokenURL = "https://api.fitbit.com/oauth2/token"
+TokenURL = 'https://api.fitbit.com/oauth2/token'
 
 #From the developer site, add b for base64 encode
-OAuthTwoClientID = b"*******"
-ClientOrConsumerSecret = b"*********************"
+OAuthTwoClientID = b'*******'
+ClientOrConsumerSecret = b'*********************'
 concatCode = OAuthTwoClientID + b":" + ClientOrConsumerSecret
 
 #Some constants defining API error handling responses
@@ -352,7 +352,7 @@ def lambda_handler(event, context):
     #--------------------------------------SET UP GOOGLE DRIVE ENVIRONMENT---------------------------------
     drive = get_drive_handle()
 
-    folder_name = 'WalkingDataCompleteCSV'
+    folder_name = <'CSV-Folder-Name'>
     folder_metadata = {'title' : folder_name, 'mimeType' : 'application/vnd.google-apps.folder'}
     
     # call up list of files in service account drive
