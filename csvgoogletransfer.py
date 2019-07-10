@@ -6,6 +6,7 @@ import io
 import csv
 from operator import itemgetter
 import base64
+import requests
 import urllib
 import urllib.request
 import urllib.error
@@ -71,30 +72,34 @@ def GetNewAccessToken(RefToken, user_id, d2lid, ou):
                 'refresh_token': RefToken}
     #URL Encode it
     BodyURLEncoded = urllib.parse.urlencode(BodyText).encode('utf-8')
-
-    #Start the request
-    tokenreq = urllib.request.Request(TokenURL, BodyURLEncoded)
+    # This is a test
+    # BodyURLEncoded = urllib.parse.urlencode(BodyText)
+    print("BODY URL ENCODED")
+    print(BodyURLEncoded)
 
     #Add the headers, first we base64 encode the client id and client secret with a : inbetween and create the authorisation header
-    base64string = base64.b64encode(concatCode)
-    tokenreq.add_header(b'Authorization', b'Basic %s' % base64string)
-    tokenreq.add_header(b'Content-Type', b'application/x-www-form-urlencoded')
+    base64string = base64.b64encode(concatCode.encode('utf-8'))
+    print(base64string)
+    headers = {
+        'Authorization': b'Basic %s' % base64string,
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
     #Fire off the request
+    print("START TOKEN REQUEST")
+    tokenreq = requests.post(TokenURL, data=BodyURLEncoded, headers=headers)
+    print(tokenreq.text)
+    print("END TOKEN REQUEST")
     try:
-        tokenresponse = urllib.request.urlopen(tokenreq)
-
-        #See what we got back.  If it's this part of  the code it was OK
-        FullResponse = tokenresponse.read()
-
         #Need to pick out the access token and write it to the config file.  Use a JSON manipluation module
-        ResponseJSON = json.loads(FullResponse)
         print("New Token Response")
-        print(ResponseJSON)
+        tokenresponse = tokenreq.json()
+        print(tokenresponse)
         print("------------------")
 
         #Read the access token as a string
-        NewAccessToken = str(ResponseJSON['access_token'])
-        NewRefreshToken = str(ResponseJSON['refresh_token'])
+        NewAccessToken = str(tokenresponse['access_token'])
+        NewRefreshToken = str(tokenresponse['refresh_token'])
 
         #Write new tokens to database (DynamoDB)
         response = key_tabledb.put_item(
@@ -107,36 +112,35 @@ def GetNewAccessToken(RefToken, user_id, d2lid, ou):
             }
         )
         return { "newAccessToken": NewAccessToken, "newRefreshToken": NewRefreshToken }
-
-    except urllib.error.URLError as e:
+    except KeyError:
         #Getting to this part of the code means we got an error
-        print(e.code)
-        print(e.reason)
+        print("ERROR")
         print("--------An error was raised when getting the access token.  Need to stop here--------")
-        
         
         #This error typically means that the user has revoked persmissions to the app.
         #Expect this error towards the end of the semester.
         #App compensates by skipping over the user and deleting user from DynamoDB database.
-        if (e.code == 400):
-            global revoke 
-            revoke = True
+        e = tokenresponse['errors']
+        for error in e:
+            if (error['errorType'] == 'invalid_grant'):
+                '''
+                global revoke 
+                revoke = True
             
-            key_tabledb.delete_item(
-                Key={
-                    'user_id': user_id,
-                }
-            )            
-            
-            print(d2lid)
-            print(user_id)
-            print(ou)
-            print("Invalid permissions from user. Skipping to next user.")
-            pass
-            
-            
-        
+                key_tabledb.delete_item(
+                    Key={
+                        'user_id': user_id,
+                    }
+                )
+                '''          
 
+                print(d2lid)
+                print(user_id)
+                print(ou)
+                print("Invalid permissions from user. Skipping to next user.")
+                return False  # Return false here to allow script to skip this user
+            else:
+                print(error)
 
 def MakeAPICall(InURL, AccToken, RefToken, user_id, d2lid, ou):
     #Start the request
